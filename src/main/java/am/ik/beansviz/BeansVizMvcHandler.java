@@ -19,29 +19,34 @@ package am.ik.beansviz;
 import static guru.nidi.graphviz.model.Factory.mutGraph;
 import static guru.nidi.graphviz.model.Factory.mutNode;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.boot.actuate.endpoint.BeansEndpoint;
+import org.springframework.boot.actuate.beans.BeansEndpoint;
+import org.springframework.boot.actuate.health.HealthEndpoint;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 
 import guru.nidi.graphviz.engine.Graphviz;
 import guru.nidi.graphviz.model.MutableGraph;
 import guru.nidi.graphviz.model.MutableNode;
 
+@Service
 public class BeansVizMvcHandler {
 	public static final String IMAGE_SVG_VALUE = "image/svg+xml";
 	private final BeansEndpoint beansEndpoint;
-
+	
 	public BeansVizMvcHandler(BeansEndpoint beansEndpoint) {
 		this.beansEndpoint = beansEndpoint;
 	}
 
 	@SuppressWarnings("unchecked")
 	ResponseEntity<String> beansviz(boolean all) {
-		List<Object> info = beansEndpoint.invoke();
+		var map = beansEndpoint.beans().getContexts();
+		List<Object> info = new ArrayList<>(map.values());
 		MutableGraph graphs = mutGraph().setDirected();
 		for (Object o : info) {
 			Map<String, Object> context = (Map<String, Object>) o;

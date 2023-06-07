@@ -16,6 +16,7 @@
 
 package am.ik.beansviz;
 
+/* 
 import org.springframework.boot.actuate.endpoint.mvc.AbstractNamedMvcEndpoint;
 import org.springframework.boot.actuate.endpoint.mvc.HypermediaDisabled;
 import org.springframework.http.ResponseEntity;
@@ -38,3 +39,4 @@ public class BeansVizNamedMvcEndpoint extends AbstractNamedMvcEndpoint {
 	}
 
 }
+*/

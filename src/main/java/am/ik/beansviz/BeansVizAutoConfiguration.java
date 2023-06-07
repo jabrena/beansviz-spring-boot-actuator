@@ -16,12 +16,14 @@
 
 package am.ik.beansviz;
 
+/*
 import org.springframework.boot.actuate.endpoint.BeansEndpoint;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
 
 @Configuration
 public class BeansVizAutoConfiguration {
@@ -52,3 +54,4 @@ public class BeansVizAutoConfiguration {
 		}
 	}
 }
+*/
