@@ -46,8 +46,13 @@ public class BeansVizMvcHandler {
 	@SuppressWarnings("unchecked")
 	ResponseEntity<String> beansviz(boolean all) {
 		var map = beansEndpoint.beans().getContexts();
-		List<Object> info = new ArrayList<>(map.values());
+		//List<Object> info = new ArrayList<>(map.values());
+		//List<Object> info = beansEndpoint.invoke();
 		MutableGraph graphs = mutGraph().setDirected();
+		map.forEach((key, value) -> {
+			System.out.println(key+" : "+ value);
+		});
+		/*
 		for (Object o : info) {
 			Map<String, Object> context = (Map<String, Object>) o;
 			MutableGraph graph = new MutableGraph().setDirected()
@@ -66,11 +71,12 @@ public class BeansVizMvcHandler {
 				}
 			}
 		}
-		String svg;
+		*/
+		String svg = "";
 		synchronized (this) {
-			Graphviz.initEngine();
+			//Graphviz.initEngine();
 			try {
-				svg = Graphviz.fromGraph(graphs).createSvg();
+				//svg = Graphviz.fromGraph(graphs).createSvg();
 			}
 			finally {
 				Graphviz.releaseEngine();
