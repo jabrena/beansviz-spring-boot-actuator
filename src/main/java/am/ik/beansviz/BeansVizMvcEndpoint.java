@@ -33,7 +33,7 @@ public class BeansVizMvcEndpoint  { // extends AbstractMvcEndpoint
 		this.beansVizMvcHandler = beansVizMvcHandler;
 	}
 
-	@GetMapping(path= "/beansviz", produces = BeansVizMvcHandler.IMAGE_SVG_VALUE)
+	@GetMapping(path= "/", produces = BeansVizMvcHandler.IMAGE_SVG_VALUE) //beansviz
 	ResponseEntity<String> beansviz(
 			@RequestParam(name = "all", defaultValue = "false") boolean all) {
 		return beansVizMvcHandler.beansviz(all);

@@ -19,17 +19,24 @@ package am.ik.beansviz;
 import static guru.nidi.graphviz.model.Factory.mutGraph;
 import static guru.nidi.graphviz.model.Factory.mutNode;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.springframework.boot.actuate.beans.BeansEndpoint;
+import org.springframework.boot.actuate.beans.BeansEndpoint.BeanDescriptor;
+import org.springframework.boot.actuate.beans.BeansEndpoint.BeansDescriptor;
+import org.springframework.boot.actuate.beans.BeansEndpoint.ContextBeansDescriptor;
 import org.springframework.boot.actuate.health.HealthEndpoint;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import guru.nidi.graphviz.attribute.Color;
+import guru.nidi.graphviz.engine.Format;
 import guru.nidi.graphviz.engine.Graphviz;
 import guru.nidi.graphviz.model.MutableGraph;
 import guru.nidi.graphviz.model.MutableNode;
@@ -45,12 +52,35 @@ public class BeansVizMvcHandler {
 
 	@SuppressWarnings("unchecked")
 	ResponseEntity<String> beansviz(boolean all) {
-		var map = beansEndpoint.beans().getContexts();
+		Map<String, ContextBeansDescriptor> map = beansEndpoint.beans().getContexts();
 		//List<Object> info = new ArrayList<>(map.values());
 		//List<Object> info = beansEndpoint.invoke();
-		MutableGraph graphs = mutGraph().setDirected();
+		MutableGraph graphs = mutGraph().setDirected(true);
+		//MutableGraph g = mutGraph("example1").setDirected(true).add(
+        //mutNode("a").add(Color.RED).addLink(mutNode("b")));  
+
+		System.out.println(map.size());
+
 		map.forEach((key, value) -> {
-			System.out.println(key+" : "+ value);
+
+			//MutableGraph graph = new MutableGraph().setDirected(true)
+			//		.setLabel((String) key.get("context"));
+			MutableGraph graph = mutGraph(value.toString()).setDirected(true).add(
+        		mutNode(value.toString()).add(Color.RED));
+			graphs.add(graph);
+
+			//System.out.println(key + " : " + value);
+			AtomicInteger counter = new AtomicInteger(0);
+			Map<String, BeanDescriptor> map2 = value.getBeans();
+			map2.forEach((key2, value2) -> {
+				//System.out.println(key2 + " : " + value2);
+				System.out.println(counter.incrementAndGet() + " " + value2.getType().getSimpleName());
+
+				MutableGraph graph2 = mutGraph(value2.getType().getSimpleName()).setDirected(true).add(
+        		mutNode(value2.getType().getSimpleName()).add(Color.RED));
+				graphs.add(graph2);
+				
+			});
 		});
 		/*
 		for (Object o : info) {
@@ -77,11 +107,15 @@ public class BeansVizMvcHandler {
 			//Graphviz.initEngine();
 			try {
 				//svg = Graphviz.fromGraph(graphs).createSvg();
+				MutableGraph g = mutGraph("example1").setDirected(true).add(
+        		mutNode("a").add(Color.RED).addLink(mutNode("b")));
+				svg = Graphviz.fromGraph(graphs).render(Format.SVG).toString();
 			}
 			finally {
-				Graphviz.releaseEngine();
+				//Graphviz.releaseEngine();
 			}
 		}
+		System.out.println(svg);
 		return ResponseEntity.status(HttpStatus.OK)
 				.contentType(MediaType.valueOf(IMAGE_SVG_VALUE)).body(svg);
 	}
