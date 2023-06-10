@@ -16,15 +16,18 @@
 
 package am.ik.beansviz;
 
+import static guru.nidi.graphviz.attribute.Rank.RankDir.LEFT_TO_RIGHT;
 import static guru.nidi.graphviz.model.Factory.mutGraph;
 import static guru.nidi.graphviz.model.Factory.mutNode;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import guru.nidi.graphviz.attribute.Rank;
 import org.springframework.boot.actuate.beans.BeansEndpoint;
 import org.springframework.boot.actuate.beans.BeansEndpoint.BeanDescriptor;
 import org.springframework.boot.actuate.beans.BeansEndpoint.BeansDescriptor;
@@ -50,36 +53,77 @@ public class BeansVizMvcHandler {
 		this.beansEndpoint = beansEndpoint;
 	}
 
+	/*
+			List<Object> info = beansEndpoint.invoke();
+		MutableGraph graphs = mutGraph().setDirected();
+		for (Object o : info) {
+			Map<String, Object> context = (Map<String, Object>) o;
+			MutableGraph graph = new MutableGraph().setDirected()
+					.setLabel((String) context.get("context"));
+			graphs.add(graph);
+			List<Map<String, Object>> beans = (List<Map<String, Object>>) context
+					.get("beans");
+			for (Map<String, Object> bean : beans) {
+				List<String> dependencies = (List<String>) bean.get("dependencies");
+				if (!dependencies.isEmpty() || all) {
+					MutableNode node = mutNode(shorten((String) bean.get("bean")));
+					for (String dep : dependencies) {
+						node.addLink(shorten(dep));
+					}
+					graph.add(node);
+				}
+			}
+		}
+	 */
+
 	@SuppressWarnings("unchecked")
 	ResponseEntity<String> beansviz(boolean all) {
-		Map<String, ContextBeansDescriptor> map = beansEndpoint.beans().getContexts();
-		//List<Object> info = new ArrayList<>(map.values());
-		//List<Object> info = beansEndpoint.invoke();
-		MutableGraph graphs = mutGraph().setDirected(true);
-		//MutableGraph g = mutGraph("example1").setDirected(true).add(
-        //mutNode("a").add(Color.RED).addLink(mutNode("b")));  
+		Map<String, ContextBeansDescriptor> context = beansEndpoint.beans().getContexts();
+		MutableGraph graphs = mutGraph()
+				.setDirected(true);
+				//.graphAttrs()
+				//.add(Rank.dir(Rank.RankDir.TOP_TO_BOTTOM));
 
-		System.out.println(map.size());
-
-		map.forEach((key, value) -> {
+		context.forEach((key, value) -> {
 
 			//MutableGraph graph = new MutableGraph().setDirected(true)
 			//		.setLabel((String) key.get("context"));
-			MutableGraph graph = mutGraph(value.toString()).setDirected(true).add(
-        		mutNode(value.toString()).add(Color.RED));
+			MutableGraph graph = mutGraph(value.toString())
+					.setDirected(true)
+					.add(mutNode(value.toString())
+					.add(Color.RED));
 			graphs.add(graph);
 
-			//System.out.println(key + " : " + value);
 			AtomicInteger counter = new AtomicInteger(0);
-			Map<String, BeanDescriptor> map2 = value.getBeans();
-			map2.forEach((key2, value2) -> {
-				//System.out.println(key2 + " : " + value2);
-				System.out.println(counter.incrementAndGet() + " " + value2.getType().getSimpleName());
+			Map<String, BeanDescriptor> beans = value.getBeans();
+			beans.forEach((key2, value2) -> {
 
-				MutableGraph graph2 = mutGraph(value2.getType().getSimpleName()).setDirected(true).add(
-        		mutNode(value2.getType().getSimpleName()).add(Color.RED));
+				//System.out.println(value2.getScope());
+				//System.out.println(key2 + " : " + value2);
+				//System.out.println(counter.incrementAndGet() + " " + value2.getType().getSimpleName());
+
+				MutableGraph graph2 = mutGraph(value2.getType().getSimpleName())
+						.setDirected(true)
+						.add(mutNode(value2.getType().getSimpleName())
+						.add(Color.RED));
 				graphs.add(graph2);
-				
+
+				System.out.println();
+				System.out.println("Dependencies for: " + value2.getType().getSimpleName());
+				List<String> dependencies = Arrays.asList(value2.getDependencies());
+				dependencies.stream().forEach(System.out::println);
+				//dependencies.stream().
+				/*
+				if (!dependencies.isEmpty() || all) {
+					MutableNode node = mutNode(shorten(value.toString()));
+					for (String dep : dependencies) {
+						node.addLink(shorten(dep));
+					}
+					graph.add(node);
+				}
+
+				 */
+
 			});
 		});
 		/*
@@ -104,18 +148,13 @@ public class BeansVizMvcHandler {
 		*/
 		String svg = "";
 		synchronized (this) {
-			//Graphviz.initEngine();
 			try {
-				//svg = Graphviz.fromGraph(graphs).createSvg();
-				MutableGraph g = mutGraph("example1").setDirected(true).add(
-        		mutNode("a").add(Color.RED).addLink(mutNode("b")));
 				svg = Graphviz.fromGraph(graphs).render(Format.SVG).toString();
-			}
-			finally {
-				//Graphviz.releaseEngine();
+			} catch (Exception e) {
+				System.out.println(e.getMessage());
 			}
 		}
-		System.out.println(svg);
+		//System.out.println(svg);
 		return ResponseEntity.status(HttpStatus.OK)
 				.contentType(MediaType.valueOf(IMAGE_SVG_VALUE)).body(svg);
 	}
