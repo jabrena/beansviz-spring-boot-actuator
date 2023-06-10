@@ -28,9 +28,9 @@
 <script src="d3.v4.min.js"></script>
 <script>
 
-  const radius = 36;
+  const radius = 36;//36
 
-  var force = -2400; //-1200;
+  var force = -5; //-1200; //2400
   var decay_force = force;
 
   var symbol = d3.symbol().size([radius * 100])
@@ -149,8 +149,8 @@
       })
 
     function update_force() {
-      const bound = -200;
-      decay_force += 200;
+      const bound = -100;//200
+      decay_force += 100;//200
       if (Math.abs(decay_force) < Math.abs(bound)) {
         decay_force = bound;
         simulation.force("charge", d3.forceManyBody().strength(decay_force))

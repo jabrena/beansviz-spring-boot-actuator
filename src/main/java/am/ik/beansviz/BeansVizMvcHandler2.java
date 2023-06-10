@@ -20,15 +20,18 @@ import guru.nidi.graphviz.attribute.Color;
 import guru.nidi.graphviz.engine.Format;
 import guru.nidi.graphviz.engine.Graphviz;
 import guru.nidi.graphviz.model.MutableGraph;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.beans.BeansEndpoint;
 import org.springframework.boot.actuate.beans.BeansEndpoint.BeanDescriptor;
 import org.springframework.boot.actuate.beans.BeansEndpoint.ContextBeansDescriptor;
+import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -43,6 +46,9 @@ public class BeansVizMvcHandler2 {
 
 	@Autowired
 	private BeansEndpoint beansEndpoint;
+
+	@Autowired
+	private ApplicationContext applicationContext;
 
 	//@SuppressWarnings("unchecked")
 	ResponseEntity<String> beansviz() {
